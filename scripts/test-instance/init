@@ -30,9 +30,6 @@ npm install --unsafe-perm
 go/build.sh
 make -C client dist
 
-TEST_EXTRAS="--no-start-selenium --url http://$HOST:8090" \
-  make -C client/test build
-
 ./run services
 
 sleep 60 # let dockers boot up
