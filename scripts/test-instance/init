@@ -40,6 +40,4 @@ sleep 60 # let dockers boot up
 
 ./run exec supervisord -c $REPOSITORY_PATH/supervisord.conf
 
-sleep 10
-
 exit 0
