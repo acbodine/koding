@@ -48,7 +48,4 @@ Xvfb $DISPLAY -shmem -screen 1 1440x900x16 &
 
 sleep 10
 
-x11vnc -passwd secret -display :0 -N -forever &
-x11vnc -passwd secret -display :1 -N -forever &
-
 exit 0
