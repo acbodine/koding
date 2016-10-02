@@ -28,7 +28,6 @@ var credPermissions = map[string][]string{
 	"plan":         []string{"user", "owner"},
 	"apply":        []string{"user", "owner"},
 	"authenticate": []string{"user", "owner"},
-	"migrate":      []string{"owner"},
 }
 
 // DialState describes state of a single dial.
