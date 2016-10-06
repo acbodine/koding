@@ -35,8 +35,6 @@ make -C client dist
 sleep 60 # let dockers boot up
 
 ./run migrate up
-./run resetdb --yes
-./run importusers
 
 ./run exec supervisord -c $REPOSITORY_PATH/supervisord.conf
 
