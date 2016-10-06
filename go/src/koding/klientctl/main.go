@@ -49,6 +49,8 @@ var sudoRequiredFor = []string{
 // cli rewrite.
 var log logging.Logger
 
+var experimental = os.Getenv("KDEXPERIMENTAL") == "1"
+
 func main() {
 	// For forward-compatibility with go1.5+, where GOMAXPROCS is
 	// always set to a number of available cores.
@@ -273,10 +275,9 @@ func main() {
 					Usage: "Updates kd & klient to latest available version.",
 				},
 				cli.BoolFlag{
-					Name: "continue",
-					// TODO(leeola): Update to the latest cli package, and use the Hidden flag
-					// for this bool flag.
-					Usage: "Internal use only.",
+					Name:   "continue",
+					Usage:  "Internal use only.",
+					Hidden: true,
 				},
 			},
 		},
@@ -368,9 +369,10 @@ func main() {
 			),
 		},
 		cli.Command{
-			Name: "log",
+			Name:  "log",
+			Usage: "Display logs.",
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "debug"},
+				cli.BoolFlag{Name: "debug", Hidden: true},
 				cli.BoolFlag{Name: "no-kd-log"},
 				cli.BoolFlag{Name: "no-klient-log"},
 				cli.StringFlag{Name: "kd-log-file"},
@@ -390,6 +392,72 @@ func main() {
 			},
 			Action: ctlcli.FactoryAction(OpenCommandFactory, log, "log"),
 		},
+	}
+
+	if experimental {
+		app.Commands = append(app.Commands,
+			cli.Command{
+				Name:      "credential",
+				ShortName: "c",
+				Usage:     "Manage stack credentials.",
+				Subcommands: []cli.Command{{
+					Name:   "import",
+					Usage:  "Import stack credentials from Koding account.",
+					Action: ctlcli.ExitAction(CheckUpdateFirst(CredentialImport, log, "import")),
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:   "debug",
+							Usage:  "Turn on debug logging.",
+							Hidden: true,
+						},
+					},
+				}, {
+					Name:      "list",
+					ShortName: "ls",
+					Usage:     "List imported stack credentials.",
+					Action:    ctlcli.ExitAction(CheckUpdateFirst(CredentialList, log, "list")),
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "json",
+							Usage: "Output in JSON format.",
+						},
+						cli.StringFlag{
+							Name:  "provider",
+							Usage: "Specify credential provider.",
+						},
+						cli.BoolFlag{
+							Name:   "debug",
+							Usage:  "Turn on debug logging.",
+							Hidden: true,
+						},
+					},
+				}, {
+					Name:   "create",
+					Usage:  "Create new stack credential.",
+					Action: ctlcli.ExitAction(CheckUpdateFirst(CredentialCreate, log, "create")),
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "json",
+							Usage: "Output in JSON format.",
+						},
+						cli.StringFlag{
+							Name:  "provider, p",
+							Usage: "Specify credential provider.",
+						},
+						cli.StringFlag{
+							Name:  "file, f",
+							Value: "-",
+							Usage: "Read credential from a file.",
+						},
+						cli.BoolFlag{
+							Name:   "debug",
+							Usage:  "Turn on debug logging.",
+							Hidden: true,
+						},
+					},
+				}},
+			},
+		)
 	}
 
 	app.Run(os.Args)
